@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Command-line interface for the Linex package.
+Command-line interface for the LineIndex package.
 
 Provides commands for:
 - Compressing text files
@@ -10,7 +10,7 @@ Provides commands for:
 import sys
 import argparse
 from typing import Optional, List, Union
-from .linex import Linex
+from .lineindex import LineIndex
 from .example import create_example_file, DEFAULT_NUM_LINES
 
 
@@ -65,7 +65,7 @@ def display_lines(
 
 def main(argv: Optional[List[str]] = None) -> int:
     """
-    Main entry point for the linex command line tool.
+    Main entry point for the lineindex command line tool.
 
     Args:
         argv: Command line arguments (uses sys.argv if None)
@@ -152,13 +152,13 @@ def main(argv: Optional[List[str]] = None) -> int:
 def handle_file_command(args):
     """Handle the file access command logic."""
     try:
-        # Initialize the Linex object
-        db = Linex(args.file, compress=args.compress, header=args.header)
+        # Initialize the LineIndex object
+        db = LineIndex(args.file, compress=args.compress, header=args.header)
 
         # If force_rebuild, clear and recreate
         if args.force_rebuild:
             db.clear()
-            db = Linex(args.file, compress=args.compress, header=args.header)
+            db = LineIndex(args.file, compress=args.compress, header=args.header)
 
         # If range is provided, display the specified lines
         if args.range:
@@ -186,10 +186,10 @@ def handle_file_command(args):
             print(f"Has header: {'Yes' if args.header else 'No'}")
             print("")
             print("Usage examples:")
-            print(f"  linex file {args.file} 0          # Get first line")
-            print(f"  linex file {args.file} 0:10       # Get first 10 lines")
-            print(f"  linex file {args.file} 5:15:2     # Get every other line from 5-14")
-            print("  linex example                     # Create an example file")
+            print(f"  lineindex file {args.file} 0          # Get first line")
+            print(f"  lineindex file {args.file} 0:10       # Get first 10 lines")
+            print(f"  lineindex file {args.file} 5:15:2     # Get every other line from 5-14")
+            print("  lineindex example                     # Create an example file")
 
         return 0
     except Exception as e:

@@ -1,10 +1,10 @@
-"""Tests for the Linex command line interface."""
+"""Tests for the LineIndex command line interface."""
 
 import os
 import tempfile
 import subprocess
 import pytest
-from linex.cli import main, parse_range
+from lineindex.cli import main, parse_range
 
 
 def test_parse_range():
@@ -61,7 +61,7 @@ def test_cli_single_line(sample_file):
 
     # Test actual command line execution
     result = subprocess.run(
-        ["linex", sample_file, "5"], capture_output=True, text=True, check=True
+        ["lineindex", sample_file, "5"], capture_output=True, text=True, check=True
     )
     assert result.stdout.strip() == "Line 5"
 
@@ -74,7 +74,7 @@ def test_cli_line_range(sample_file):
 
     # Test actual command line execution
     result = subprocess.run(
-        ["linex", sample_file, "5:10"], capture_output=True, text=True, check=True
+        ["lineindex", sample_file, "5:10"], capture_output=True, text=True, check=True
     )
     output_lines = result.stdout.strip().split("\n")
     assert len(output_lines) == 5
@@ -86,7 +86,7 @@ def test_cli_line_numbers(sample_file):
     """Test CLI with line number display."""
     # Test the command with line numbers
     result = subprocess.run(
-        ["linex", sample_file, "5:8", "--line-numbers"], capture_output=True, text=True, check=True
+        ["lineindex", sample_file, "5:8", "--line-numbers"], capture_output=True, text=True, check=True
     )
     output_lines = result.stdout.strip().split("\n")
     assert len(output_lines) == 3
@@ -99,7 +99,7 @@ def test_cli_line_numbers(sample_file):
 def test_cli_invalid_range(sample_file):
     """Test CLI with invalid range."""
     # This should fail with non-zero exit code
-    result = subprocess.run(["linex", sample_file, "invalid"], capture_output=True, text=True)
+    result = subprocess.run(["lineindex", sample_file, "invalid"], capture_output=True, text=True)
     assert result.returncode != 0
     assert "Error" in result.stderr
 
@@ -107,7 +107,7 @@ def test_cli_invalid_range(sample_file):
 def test_cli_out_of_bounds(sample_file):
     """Test CLI with out-of-bounds index."""
     # This should fail with non-zero exit code
-    result = subprocess.run(["linex", sample_file, "1000"], capture_output=True, text=True)
+    result = subprocess.run(["lineindex", sample_file, "1000"], capture_output=True, text=True)
     assert result.returncode != 0
     assert "Error" in result.stderr
 
@@ -115,7 +115,7 @@ def test_cli_out_of_bounds(sample_file):
 def test_cli_no_args():
     """Test CLI with no arguments."""
     # This should show help and exit with 0
-    result = subprocess.run(["linex"], capture_output=True, text=True)
+    result = subprocess.run(["lineindex"], capture_output=True, text=True)
     assert result.returncode == 0
     assert "usage:" in result.stdout
 
@@ -127,7 +127,7 @@ def test_cli_example_command():
     try:
         # Run the example command
         result = subprocess.run(
-            ["linex", "example", "--output", example_file, "--lines", "50"],
+            ["lineindex", "example", "--output", example_file, "--lines", "50"],
             capture_output=True,
             text=True,
             check=True,

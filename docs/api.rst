@@ -1,12 +1,12 @@
 API Reference
 ============
 
-This page documents the Linex API in detail.
+This page documents the LineIndex API in detail.
 
-Linex Class
+LineIndex Class
 ----------
 
-.. automodule:: linex.linex
+.. automodule:: lineindex.lineindex
    :members:
    :undoc-members:
    :show-inheritance:
@@ -14,7 +14,7 @@ Linex Class
 Command Line Interface
 --------------------
 
-.. automodule:: linex.cli
+.. automodule:: lineindex.cli
    :members:
    :undoc-members:
    :show-inheritance:

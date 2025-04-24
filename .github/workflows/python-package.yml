@@ -43,7 +43,7 @@ jobs:
         run: |
           # Only run on one Python version to avoid duplicated reports
           if [ "${{ matrix.python-version }}" == "3.10" ]; then
-            flake8 linex tests
+            flake8 lineindex tests
           fi
 
   bump_version:

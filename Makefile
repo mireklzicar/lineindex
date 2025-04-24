@@ -35,13 +35,13 @@ clean-test:
 	rm -fr .pytest_cache
 
 lint:
-	flake8 linex tests
-	black --check linex tests
-	isort --check linex tests
+	flake8 lineindex tests
+	black --check lineindex tests
+	isort --check lineindex tests
 
 format:
-	black linex tests
-	isort linex tests
+	black lineindex tests
+	isort lineindex tests
 
 test:
 	pytest
@@ -50,13 +50,13 @@ test-all:
 	tox
 
 coverage:
-	pytest --cov=linex --cov-report=html
+	pytest --cov=lineindex --cov-report=html
 	@echo "Open htmlcov/index.html to view report"
 
 docs:
-	rm -f docs/linex.rst
+	rm -f docs/lineindex.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ linex
+	sphinx-apidoc -o docs/ lineindex
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	@echo "Open docs/_build/html/index.html to view documentation"

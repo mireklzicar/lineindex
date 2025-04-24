@@ -2,8 +2,8 @@
 
 import os
 import tempfile
-from linex.example import create_example_file, DEFAULT_NUM_LINES
-from linex import Linex
+from lineindex.example import create_example_file, DEFAULT_NUM_LINES
+from lineindex import LineIndex
 
 
 def test_create_example_file():
@@ -49,8 +49,8 @@ def test_example_import():
         # The file should already exist from importing the module
         assert os.path.exists(example_path)
 
-        # Should be able to use it with Linex
-        db = Linex(example_path)
+        # Should be able to use it with LineIndex
+        db = LineIndex(example_path)
         assert len(db) == DEFAULT_NUM_LINES
         assert db[0] == "Line 0"
         assert db[10] == "Line 10"

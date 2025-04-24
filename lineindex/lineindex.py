@@ -1,5 +1,5 @@
 """
-Linex - Fast line-based random access for large text files
+LineIndex - Fast line-based random access for large text files
 
 This module provides efficient indexed access to text files by line number,
 with optional compression support using the BGZF format (through idzip).
@@ -21,7 +21,7 @@ except ImportError:
     IDZIP_AVAILABLE = False
 
 
-class Linex:
+class LineIndex:
     """
     Fast line-by-line access to text files through indexing.
 

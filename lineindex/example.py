@@ -1,5 +1,5 @@
 """
-Provides example data and functionality for Linex.
+Provides example data and functionality for LineIndex.
 
 This module creates an example text file when imported and provides
 utility functions for generating example files.

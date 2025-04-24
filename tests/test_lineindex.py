@@ -1,9 +1,9 @@
-"""Tests for the Linex class."""
+"""Tests for the LineIndex class."""
 
 import os
 import tempfile
 import pytest
-from linex import Linex
+from lineindex import LineIndex
 
 
 @pytest.fixture
@@ -26,15 +26,15 @@ def sample_file():
 
 
 def test_init(sample_file):
-    """Test Linex initialization."""
-    db = Linex(sample_file)
+    """Test LineIndex initialization."""
+    db = LineIndex(sample_file)
     assert len(db) == 1000
     assert os.path.exists(sample_file + ".idx")
 
 
 def test_single_line_access(sample_file):
     """Test accessing single lines."""
-    db = Linex(sample_file)
+    db = LineIndex(sample_file)
 
     # First line
     assert db[0] == "Line 0"
@@ -52,7 +52,7 @@ def test_single_line_access(sample_file):
 
 def test_slice_access(sample_file):
     """Test accessing slices of lines."""
-    db = Linex(sample_file)
+    db = LineIndex(sample_file)
 
     # Simple slice
     lines = db[10:15]
@@ -76,7 +76,7 @@ def test_slice_access(sample_file):
 
 def test_parallel_access(sample_file):
     """Test parallel line retrieval."""
-    db = Linex(sample_file)
+    db = LineIndex(sample_file)
 
     # Sequential access
     lines_seq = db[100:200]
@@ -90,7 +90,7 @@ def test_parallel_access(sample_file):
 
 def test_header_option(sample_file):
     """Test the header option."""
-    db = Linex(sample_file, header=True)
+    db = LineIndex(sample_file, header=True)
 
     # First line should now be the second line in the file
     assert db[0] == "Line 1"
@@ -101,7 +101,7 @@ def test_header_option(sample_file):
 
 def test_fetch_many(sample_file):
     """Test fetching multiple lines in optimized order."""
-    db = Linex(sample_file)
+    db = LineIndex(sample_file)
 
     # Fetch lines in random order
     indices = [5, 100, 50, 999, 0]
@@ -117,7 +117,7 @@ def test_fetch_many(sample_file):
 
 def test_out_of_bounds(sample_file):
     """Test behavior with out-of-bounds indices."""
-    db = Linex(sample_file)
+    db = LineIndex(sample_file)
 
     # Index too large
     with pytest.raises(IndexError):
@@ -130,7 +130,7 @@ def test_out_of_bounds(sample_file):
 
 def test_clear(sample_file):
     """Test clearing index files."""
-    db = Linex(sample_file)
+    db = LineIndex(sample_file)
     assert os.path.exists(sample_file + ".idx")
 
     db.clear()
@@ -142,7 +142,7 @@ def test_clear(sample_file):
 def test_compression(sample_file):
     """Test file compression (requires idzip package)."""
     try:
-        db = Linex(sample_file, compress=True)
+        db = LineIndex(sample_file, compress=True)
 
         # Check compressed file was created
         assert os.path.exists(sample_file + ".dz")

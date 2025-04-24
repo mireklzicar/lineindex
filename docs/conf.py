@@ -1,5 +1,5 @@
 """
-Sphinx configuration for Linex documentation.
+Sphinx configuration for LineIndex documentation.
 """
 import os
 import sys
@@ -9,13 +9,13 @@ from datetime import datetime
 sys.path.insert(0, os.path.abspath('..'))
 
 # Project information
-project = 'Linex'
+project = 'LineIndex'
 copyright = f'{datetime.now().year}, Miroslav Lžičař'
 author = 'Miroslav Lžičař'
 
 # The full version, including alpha/beta/rc tags
 try:
-    from linex._version import __version__
+    from lineindex._version import __version__
     version = __version__
     release = __version__
 except ImportError:

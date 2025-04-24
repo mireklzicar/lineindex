@@ -1,16 +1,16 @@
-Welcome to Linex's documentation!
+Welcome to LineIndex's documentation!
 ==============================
 
-**Linex** is a Python library for fast line-based random access to large text files.
+**LineIndex** is a Python library for fast line-based random access to large text files.
 It provides an efficient way to retrieve specific lines from text files without 
 reading the entire file into memory.
 
-.. image:: https://img.shields.io/pypi/v/linex.svg
-    :target: https://pypi.org/project/linex/
+.. image:: https://img.shields.io/pypi/v/lineindex.svg
+    :target: https://pypi.org/project/lineindex/
     :alt: PyPI Version
 
-.. image:: https://img.shields.io/pypi/pyversions/linex.svg
-    :target: https://pypi.org/project/linex/
+.. image:: https://img.shields.io/pypi/pyversions/lineindex.svg
+    :target: https://pypi.org/project/lineindex/
     :alt: Python Versions
 
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -29,29 +29,29 @@ Features
 Installation
 -----------
 
-You can install Linex via pip:
+You can install LineIndex via pip:
 
 .. code-block:: bash
 
-   pip install linex
+   pip install lineindex
 
 For compression support, install the optional dependencies:
 
 .. code-block:: bash
 
-   pip install linex[compression]
+   pip install lineindex[compression]
 
 Getting Started
 --------------
 
-Here's a simple example of how to use Linex:
+Here's a simple example of how to use LineIndex:
 
 .. code-block:: python
 
-   from linex import Linex
+   from lineindex import LineIndex
 
    # Create an index for a text file
-   db = Linex("large_file.txt")
+   db = LineIndex("large_file.txt")
 
    # Get a single line
    line = db[1000]  # Get the 1001st line (0-indexed)

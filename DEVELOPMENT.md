@@ -1,13 +1,13 @@
 # Development Guide
 
-This document provides instructions for developing, testing, and publishing the Linex package.
+This document provides instructions for developing, testing, and publishing the LineIndex package.
 
 ## Setting Up Development Environment
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/mireklzicar/linex.git
-   cd linex
+   git clone https://github.com/mireklzicar/lineindex.git
+   cd lineindex
    ```
 
 2. Create a virtual environment:
@@ -32,7 +32,7 @@ pytest
 
 ### Run with coverage report:
 ```bash
-pytest --cov=linex
+pytest --cov=lineindex
 ```
 
 ### Run with verbose output:
@@ -42,7 +42,7 @@ pytest -v
 
 ### Run specific test file:
 ```bash
-pytest tests/test_linex.py
+pytest tests/test_lineindex.py
 ```
 
 ### Run tests in parallel:
@@ -56,13 +56,13 @@ The code should follow PEP 8 style guidelines. Run these commands to ensure prop
 
 ```bash
 # Check code style with flake8
-flake8 linex tests
+flake8 lineindex tests
 
 # Format code with black
-black linex tests
+black lineindex tests
 
 # Sort imports with isort
-isort linex tests
+isort lineindex tests
 ```
 
 ## Building Documentation
@@ -71,7 +71,7 @@ The documentation is built using Sphinx:
 
 ```bash
 # Generate API documentation
-sphinx-apidoc -o docs/ linex
+sphinx-apidoc -o docs/ lineindex
 
 # Build HTML documentation
 cd docs
@@ -101,8 +101,8 @@ Before making your first commit or publishing to PyPI, make sure to:
    pip install -e .
    
    # Try basic functionality
-   linex example
-   linex example.txt 0:10
+   lineindex example
+   lineindex example.txt 0:10
    ```
 
 3. **Try with compression**:
@@ -111,8 +111,8 @@ Before making your first commit or publishing to PyPI, make sure to:
    pip install -e ".[compression]"
    
    # Test compression
-   linex file example.txt --compress
-   linex file example.txt.dz 0:10
+   lineindex file example.txt --compress
+   lineindex file example.txt.dz 0:10
    ```
 
 4. **Check distribution builds correctly**:
@@ -143,31 +143,31 @@ Before making your first commit or publishing to PyPI, make sure to:
 7. **Test CLI commands**:
    ```bash
    # Test example command
-   linex example
+   lineindex example
    
    # Test file command
-   linex file example.txt 0:10
+   lineindex file example.txt 0:10
    
    # Test legacy syntax
-   linex example.txt 0:10
+   lineindex example.txt 0:10
    ```
 
 8. **Test package in a clean environment**:
    ```bash
    # Create a temporary directory
-   mkdir ~/linex-test
-   cd ~/linex-test
+   mkdir ~/lineindex-test
+   cd ~/lineindex-test
    
    # Create a fresh virtual environment
    python -m venv test-venv
    source test-venv/bin/activate  # On Windows: test-venv\Scripts\activate
    
    # Install from the built distribution
-   pip install /path/to/your/linex/dist/linex-0.1.0.tar.gz
+   pip install /path/to/your/lineindex/dist/lineindex-0.1.0.tar.gz
    
    # Test functionality
-   linex example
-   linex example.txt 0:10
+   lineindex example
+   lineindex example.txt 0:10
    ```
 
 ## Publishing
@@ -180,7 +180,7 @@ Once you've completed all checks, you can publish the package:
    python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
    
    # Install from TestPyPI
-   pip install --index-url https://test.pypi.org/simple/ linex
+   pip install --index-url https://test.pypi.org/simple/ lineindex
    ```
 
 2. If everything looks good, publish to PyPI:
@@ -191,9 +191,9 @@ Once you've completed all checks, you can publish the package:
 
 3. After publishing, verify the installation works from PyPI:
    ```bash
-   pip install linex
-   linex example
-   linex example.txt 0:10
+   pip install lineindex
+   lineindex example
+   lineindex example.txt 0:10
    ```
 
 ## CI/CD Workflow

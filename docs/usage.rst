@@ -1,24 +1,24 @@
 Usage
 =====
 
-This page provides detailed usage examples for the Linex library.
+This page provides detailed usage examples for the LineIndex library.
 
 Basic Usage
 ----------
 
-Initialize a Linex object by providing a file path:
+Initialize a LineIndex object by providing a file path:
 
 .. code-block:: python
 
-   from linex import Linex
+   from lineindex import LineIndex
    
    # Create an index for a text file
-   db = Linex("large_file.txt")
+   db = LineIndex("large_file.txt")
 
 Accessing Lines
 --------------
 
-Linex supports several ways to access lines in a file:
+LineIndex supports several ways to access lines in a file:
 
 Single Line Access
 ~~~~~~~~~~~~~~~~~
@@ -73,7 +73,7 @@ When working with CSV files or other data formats with headers:
 .. code-block:: python
 
    # Create an index with header=True to skip the first line
-   db = Linex("data.csv", header=True)
+   db = LineIndex("data.csv", header=True)
    
    # Now db[0] will give you the first data row (not the header)
    first_data_row = db[0]
@@ -81,12 +81,12 @@ When working with CSV files or other data formats with headers:
 Compression
 ----------
 
-Linex supports working with compressed files:
+LineIndex supports working with compressed files:
 
 .. code-block:: python
 
    # Create a compressed version of the file
-   db = Linex("large_file.txt", compress=True)
+   db = LineIndex("large_file.txt", compress=True)
    
    # This creates large_file.txt.dz (BGZF format)
    # Future accesses will use the compressed file
@@ -97,7 +97,7 @@ Linex supports working with compressed files:
 Performance Considerations
 ------------------------
 
-- The first time you access a file, Linex creates an index file
+- The first time you access a file, LineIndex creates an index file
 - Subsequent access to the same file will reuse the index
 - Memory usage remains low even for very large files
 - For batch operations, using multiple workers can significantly improve performance
