@@ -10,6 +10,7 @@ import mmap
 import numpy as np
 from tqdm import tqdm
 import concurrent.futures
+from typing import List, Union, Optional
 
 try:
     import idzip
@@ -259,7 +260,7 @@ class Linex:
         return line.decode()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ batch retrieval ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def fetch_many(self, ids: list[int]) -> list[str]:
+    def fetch_many(self, ids: List[int]) -> List[str]:
         """
         Fetch multiple lines by their indices in optimized order.
         
