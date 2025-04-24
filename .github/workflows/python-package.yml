@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+# Add explicit permissions
+permissions:
+  contents: write  # Gives permission to push to the repository
+
 jobs:
   test:
     runs-on: ubuntu-latest
