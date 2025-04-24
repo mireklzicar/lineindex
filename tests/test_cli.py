@@ -86,7 +86,8 @@ def test_cli_line_numbers(sample_file):
     """Test CLI with line number display."""
     # Test the command with line numbers
     result = subprocess.run(
-        ["lineindex", sample_file, "5:8", "--line-numbers"], capture_output=True, text=True, check=True
+        ["lineindex", sample_file, "5:8", "--line-numbers"], capture_output=True,
+        text=True, check=True
     )
     output_lines = result.stdout.strip().split("\n")
     assert len(output_lines) == 3

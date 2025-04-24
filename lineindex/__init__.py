@@ -4,5 +4,4 @@ from .lineindex import LineIndex
 from . import example
 from ._version import __version__
 
-__all__ = ["LineIndex", "example"]
-
+__all__ = ["LineIndex", "example", "__version__"]
