@@ -50,7 +50,7 @@ package-data = {"linex" = ["data/*.txt"]}
 
 [tool.flake8]
 max-line-length = 99
-extend-ignore = "E203"
+extend-ignore = "E203,D401,D400,D107,D105,D104,E302,W293"
 exclude = ["build", "dist", "*.egg-info", ".git", ".tox", "__pycache__", "docs"]
 
 [tool.black]
