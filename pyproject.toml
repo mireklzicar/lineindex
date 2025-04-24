@@ -23,7 +23,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
 ]
-dynamic = ["version"]
+
 dependencies = [
     "numpy>=1.20.0",
     "tqdm>=4.50.0",
