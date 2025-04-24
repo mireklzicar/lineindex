@@ -1,12 +1,6 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm>=6.2"]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools_scm]
-write_to = "linex/_version.py"
-write_to_template = """\"\"\"Version information.\"\"\"
-__version__ = "{version}"
-"""
 
 [project]
 name = "linex"
