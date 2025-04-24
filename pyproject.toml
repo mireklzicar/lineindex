@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=42", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "linex/_version.py"
+write_to_template = """\"\"\"Version information.\"\"\"
+__version__ = "{version}"
+"""
+
+[project]
+name = "linex"
+description = "Fast line-based random access to large text files with optional compression"
+authors = [
+    {name = "Miroslav Lžičař", email = "mireklzicar@seznam.com"},
+]
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Text Processing :: Indexing",
+    "Topic :: System :: Archiving :: Compression",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy>=1.20.0",
+    "tqdm>=4.50.0",
+]
+
+[project.optional-dependencies]
+compression = ["python-idzip>=0.3.3"]
+lint = ["flake8", "black", "isort"]
+test = ["pytest", "mypy", "pytest-cov"]
+docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]
+dev = ["linex[compression,lint,test,docs]", "bump2version"]
+
+[project.scripts]
+linex = "linex.cli:main"
+
+[tool.setuptools]
+packages = ["linex"]
+package-data = {"linex" = ["data/*.txt"]}
+
+[tool.flake8]
+max-line-length = 99
+extend-ignore = "E203"
+exclude = ["build", "dist", "*.egg-info", ".git", ".tox", "__pycache__", "docs"]
+
+[tool.black]
+line-length = 99
+target-version = ["py38"]
+
+[tool.isort]
+profile = "black"
+line_length = 99
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
