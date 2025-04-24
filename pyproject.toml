@@ -36,7 +36,7 @@ dependencies = [
 
 [project.optional-dependencies]
 compression = ["python-idzip>=0.3.3"]
-lint = ["flake8", "black", "isort"]
+lint = ["flake8", "flake8-pyproject", "black", "isort"]
 test = ["pytest", "mypy", "pytest-cov"]
 docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]
 dev = ["linex[compression,lint,test,docs]", "bump2version"]
