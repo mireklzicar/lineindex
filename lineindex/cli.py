@@ -186,9 +186,9 @@ def handle_file_command(args):
             print(f"Has header: {'Yes' if args.header else 'No'}")
             print("")
             print("Usage examples:")
-            print(f"  lineindex file {args.file} 0          # Get first line")
-            print(f"  lineindex file {args.file} 0:10       # Get first 10 lines")
-            print(f"  lineindex file {args.file} 5:15:2     # Get every other line from 5-14")
+            print(f"  lineindex {args.file} 0          # Get first line")
+            print(f"  lineindex {args.file} 0:10       # Get first 10 lines")
+            print(f"  lineindex {args.file} 5:15:2     # Get every other line from 5-14")
             print("  lineindex example                     # Create an example file")
 
         return 0
