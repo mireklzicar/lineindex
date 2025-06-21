@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+example.txt*
 # Distribution / packaging
 .Python
 build/
