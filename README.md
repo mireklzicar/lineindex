@@ -28,6 +28,22 @@ pip install lineindex[compression]
 pip install lineindex[dev]
 ```
 
+## First Test
+
+```bash
+# Creates example.txt with 1000 lines in current dir
+lineindex example 
+
+# Indexes the file
+lineindex example.txt
+
+# Fetches line 5
+lineindex example.txt 5
+
+# Fetches lines 10 to 20
+lineindex example.txt 10:20
+```
+
 ## Quick Start
 
 ### Python API
@@ -71,22 +87,22 @@ db = LineIndex("custom.txt")
 
 ```bash
 # Index and compress a file
-lineindex file bigfile.txt --compress
+lineindex bigfile.txt --compress
 
 # Get a single line
-lineindex file bigfile.txt 1000
+lineindex bigfile.txt 1000
 
 # Get a range of lines
-lineindex file bigfile.txt 1000:1010
+lineindex bigfile.txt 1000:1010
 
 # Get every other line with line numbers
-lineindex file bigfile.txt 1000:1100:2 --line-numbers
+lineindex bigfile.txt 1000:1100:2 --line-numbers
 
 # Use multiple threads for better performance
-lineindex file bigfile.txt 1000:2000 --threads 4
+lineindex bigfile.txt 1000:2000 --threads 4
 
 # Skip header line (useful for CSV files)
-lineindex file data.csv 0 --header
+lineindex data.csv 0 --header
 
 # Create an example file with 1000 lines
 lineindex example
