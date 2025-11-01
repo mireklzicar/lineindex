@@ -117,6 +117,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     file_parser.add_argument(
         "--force-rebuild", "-f", action="store_true", help="Force rebuild of index files"
     )
+    file_parser.add_argument(
+        "--memory-map",
+        choices=["auto", "none", "offsets", "data", "all"],
+        default="auto",
+        help="Memory mapping mode: auto (default), none, offsets, data, or all",
+    )
 
     # Backwards-compat: if argv is None, get it from sys.argv
     if argv is None:
@@ -153,12 +159,22 @@ def handle_file_command(args):
     """Handle the file access command logic."""
     try:
         # Initialize the LineIndex object
-        db = LineIndex(args.file, compress=args.compress, header=args.header)
+        db = LineIndex(
+            args.file,
+            compress=args.compress,
+            header=args.header,
+            memory_map=args.memory_map,
+        )
 
         # If force_rebuild, clear and recreate
         if args.force_rebuild:
             db.clear()
-            db = LineIndex(args.file, compress=args.compress, header=args.header)
+            db = LineIndex(
+                args.file,
+                compress=args.compress,
+                header=args.header,
+                memory_map=args.memory_map,
+            )
 
         # If range is provided, display the specified lines
         if args.range:

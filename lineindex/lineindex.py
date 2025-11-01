@@ -11,7 +11,7 @@ import mmap
 import numpy as np
 from tqdm import tqdm
 import concurrent.futures
-from typing import List
+from typing import List, Optional
 
 try:
     import idzip
@@ -34,15 +34,18 @@ class LineIndex:
         filepath (str): Path to the text file to index
         compress (bool, optional): Whether to compress the source file. Defaults to False.
         header (bool, optional): Whether the file has a header line to skip. Defaults to False.
+        memory_map (str, optional): Memory-mapping mode. One of
+            {"auto", "none", "offsets", "data", "all"}. Defaults to "auto".
     """
 
     ONE_MB = 1 << 20
     TEN_MB = 10 * ONE_MB
     HUNDRED_MB = 100 * ONE_MB
     OFFSET_DTYPE = np.uint64  # <Q little-endian, 8 bytes / entry
+    VALID_MEMORY_MAP = {"auto", "none", "offsets", "data", "all"}
 
     # ------------------------------------------------------------------ init
-    def __init__(self, filepath, *, compress=False, header=False):
+    def __init__(self, filepath, *, compress=False, header=False, memory_map="auto"):
         if compress and not IDZIP_AVAILABLE:
             raise ImportError(
                 "To use compression, please install the idzip package: pip install python-idzip"
@@ -51,12 +54,22 @@ class LineIndex:
         self.filepath = filepath
         self.filename = os.path.basename(filepath)
         self.compress = compress
+        self.memory_map_mode = (memory_map or "auto").lower()
+        if self.memory_map_mode not in self.VALID_MEMORY_MAP:
+            valid = ", ".join(sorted(self.VALID_MEMORY_MAP))
+            raise ValueError(f"memory_map must be one of: {valid}")
         self.output_filepath = filepath + (".dz" if compress else "")
         self.header = header
         self.output_directory = os.path.dirname(self.output_filepath) or "."
         self.byteoffset_file = os.path.join(self.output_directory, self.filename + ".idx")
+        self.mm: Optional[mmap.mmap] = None
+        self.main_file = None
+        self.offsets = None
+        self._map_data_file = False
+        self._map_offsets = False
 
         self._build_or_validate()
+        self._configure_memory_map_flags()
 
         # open (or create) the data file --------------------------------
         if not compress:
@@ -74,7 +87,7 @@ class LineIndex:
             self._write_byte_offsets_bin()
 
         # a single mem-mapped view of all offsets (cheap, lazy-loaded)
-        self.offsets = np.memmap(self.byteoffset_file, dtype=self.OFFSET_DTYPE, mode="r")
+        self.offsets = self._load_offsets()
 
     def _build_or_validate(self):
         """Ensure the file exists and count lines if needed."""
@@ -114,10 +127,7 @@ class LineIndex:
 
     # ---------------------------------------------------------------- utils
     def __del__(self):
-        try:
-            self.main_file.close()
-        except Exception:
-            pass  # happens if __init__ failed early
+        self.close()
 
     def __len__(self):
         return self.numlines
@@ -193,12 +203,12 @@ class LineIndex:
         """Open the main data file and create a memory map."""
         # always binary read. For compressed files this is a BGZF wrapper
         self.main_file = self.file_opener(self.output_filepath, "rb")
-        if not self.compress:
+        self.mm = None
+        if self._map_data_file:
+            if self.compress:
+                raise ValueError("memory_map='data' or 'all' requires an uncompressed file")
             # uncompressed → mmap for speed
             self.mm = mmap.mmap(self.main_file.fileno(), 0, access=mmap.ACCESS_READ)
-        else:
-            # compressed → use file-handle only
-            self.mm = None
 
     # ~~~~~~~~~~~~~~~~~~~~~ compression of the source file ~~~~~~~~~~~~~~~~~~
     def _compress_file(self):
@@ -248,12 +258,13 @@ class LineIndex:
         off = self._get_byte_offset(line_number)
         if self.mm is not None:
             # mmap path
-            end = self.mm.find(b"\n", off)
+            off_int = int(off)
+            end = self.mm.find(b"\n", off_int)
             if end == -1:
                 end = len(self.mm)
-            return self.mm[off:end].decode()
+            return self.mm[off_int:end].decode()
         # compressed path → idzip file
-        self.main_file.seek(off)
+        self.main_file.seek(int(off))
         line = self.main_file.readline()
         # strip trailing newline
         if line.endswith(b"\n"):
@@ -274,26 +285,30 @@ class LineIndex:
         ids_np = np.asarray(ids, dtype=np.int64)
         order = np.argsort(ids_np)
 
-        # Apply header offset if needed
-        if self.header:
-            ids_np = ids_np + 1
-
+        adjusted_ids = ids_np + 1 if self.header else ids_np
         # Get offsets for all requested lines (in sorted order)
-        offs = self.offsets[ids_np[order]]  # vectorised RAM read
+        offs = self.offsets[adjusted_ids[order]]  # vectorised RAM read
         lines = [None] * len(ids)
 
-        # Read lines in sequential order for better IO performance
-        for slot, off in zip(order, offs):
-            end = self.mm.find(b"\n", off)
-            if end == -1:
-                end = len(self.mm)
-            lines[slot] = self.mm[off:end].decode()
+        if self.mm is not None:
+            # Read lines in sequential order for better IO performance
+            for slot, off in zip(order, offs):
+                off_int = int(off)
+                end = self.mm.find(b"\n", off_int)
+                if end == -1:
+                    end = len(self.mm)
+                lines[slot] = self.mm[off_int:end].decode()
+            return lines
+
+        for slot, idx in zip(order, ids_np[order]):
+            lines[slot] = self._get_line(int(idx))
 
         return lines
 
     # ---------------------------------------------------------------- util
     def clear(self):
         """Delete generated .dz and/or .idx files (for tests/rebuilds)."""
+        self.close()
         if self.compress and os.path.exists(self.output_filepath):
             os.remove(self.output_filepath)
         if os.path.exists(self.byteoffset_file):
@@ -301,3 +316,53 @@ class LineIndex:
         numlines_file = os.path.join(self.output_directory, self.filename + ".numlines")
         if os.path.exists(numlines_file):
             os.remove(numlines_file)
+
+    # ---------------------------------------------------------------- util
+    def close(self):
+        """Close open file handles and memory maps."""
+        if isinstance(self.offsets, np.memmap):
+            self.offsets._mmap.close()
+        self.offsets = None
+
+        if self.mm is not None:
+            self.mm.close()
+            self.mm = None
+
+        if self.main_file is not None:
+            try:
+                self.main_file.close()
+            except Exception:
+                pass
+            self.main_file = None
+
+    # -------------------------------------------------------------- helpers
+    def _configure_memory_map_flags(self):
+        """Determine memory-mapping behaviour based on user preference."""
+        mode = self.memory_map_mode
+        if mode == "auto":
+            self._map_data_file = not self.compress
+            self._map_offsets = True
+        elif mode == "none":
+            self._map_data_file = False
+            self._map_offsets = False
+        elif mode == "offsets":
+            self._map_data_file = False
+            self._map_offsets = True
+        elif mode == "data":
+            if self.compress:
+                raise ValueError("memory_map='data' requires an uncompressed file")
+            self._map_data_file = True
+            self._map_offsets = False
+        elif mode == "all":
+            if self.compress:
+                raise ValueError("memory_map='all' requires an uncompressed file")
+            self._map_data_file = True
+            self._map_offsets = True
+        else:
+            raise ValueError(f"Unsupported memory_map mode: {mode}")
+
+    def _load_offsets(self):
+        """Load or memory map the offsets array."""
+        if self._map_offsets:
+            return np.memmap(self.byteoffset_file, dtype=self.OFFSET_DTYPE, mode="r")
+        return np.fromfile(self.byteoffset_file, dtype=self.OFFSET_DTYPE)
