@@ -1,4 +1,11 @@
-benchmarks/data
+# Benchmarks and working dirs
+benchmarks/general/data/
+benchmarks/general/plots/
+benchmarks/general/results.json
+benchmarks/na18507_tabix_chr1_40x/work/
+benchmarks/na18507_tabix_chr1_40x/.micromamba/
+benchmarks/na18507_tabix_chr1_40x/micromamba*
+benchmarks/na18507_tabix_chr1_40x/env/
 example.txt*
 
 # Byte-compiled / optimized / DLL files

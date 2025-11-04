@@ -28,7 +28,7 @@ cut -f1 work/fastq_urls_md5.tsv | xargs -P "$THREADS" -n 1 -I {} bash -c '
 
 # Verify MD5
 echo "[CHK] MD5 verification"
-paste <(cut -f2 work/fastq_urls_md5.tsv) <(cut -f1 work/fastq_urls_md5.tsv | awk -F/ "{print \"work/fastq/\"$NF}") | \
+paste <(cut -f2 work/fastq_urls_md5.tsv) <(cut -f1 work/fastq_urls_md5.tsv | awk -F/ '{print "work/fastq/" $NF}') | \
   awk '{print $1"  "$2}' > work/fastq.md5
 md5sum -c work/fastq.md5
 echo "[OK] Downloads verified"

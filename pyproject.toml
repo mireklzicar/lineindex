@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.17.1"]
+build-backend = "hatchling.build"
 
 [project]
 name = "lineindex"
@@ -35,13 +35,13 @@ lint = ["flake8", "flake8-pyproject", "black", "isort"]
 test = ["pytest", "mypy", "pytest-cov"]
 docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]
 dev = ["lineindex[compression,lint,test,docs]", "bump2version"]
+bio = ["lineindex[compression]", "pyfaidx>=0.7.2"]
 
 [project.scripts]
 lineindex = "lineindex.cli:main"
 
-[tool.setuptools]
+[tool.hatch.build.targets.wheel]
 packages = ["lineindex"]
-package-data = {"lineindex" = ["data/*.txt"]}
 
 [tool.flake8]
 max-line-length = 99

@@ -24,6 +24,9 @@ pip install lineindex
 # With compression support
 pip install lineindex[compression]
 
+# Genomics helpers (region adapter + FASTA)
+pip install lineindex[bio]
+
 # For developers
 pip install lineindex[dev]
 ```
@@ -109,6 +112,14 @@ lineindex example
 
 # Create an example file with custom number of lines
 lineindex example --lines 5000 --output my_example.txt
+
+# Build/query a simple region index over TSV (chrom, start, end, ...)
+lineindex region build --tsv path/to/regions.tsv
+lineindex region query --tsv path/to/regions.tsv --bed regions.bed > matches.tsv
+
+# FASTA helpers (requires [bio] extra)
+lineindex fasta fetch --fasta ref.fa --region chr1:1000-1100
+lineindex fasta fetch --fasta ref.fa --bed regions.bed > regions.fa.tsv
 ```
 
 > **Note:** For backward compatibility, you can omit the `file` command, e.g., `lineindex bigfile.txt 1000`.
@@ -118,6 +129,31 @@ lineindex example --lines 5000 --output my_example.txt
 LineIndex creates a binary index file (.idx) containing the byte offset of each line in the file. This allows for O(1) access to any line by seeking directly to its byte position. The index is created once and reused for subsequent accesses.
 
 For compressed files, LineIndex uses the BGZF format (via the `idzip` package) which preserves random access capabilities despite compression.
+
+### Bio extra (`[bio]`)
+- Adds a simple region adapter for TSV files that start with `chrom, start, end` columns. It builds a small per-chromosome interval index and lets you query overlapping records using a BED file. Retrieval of the matching lines is done via LineIndex (supports uncompressed or `.dz`-compressed TSVs).
+- Adds FASTA helpers backed by `pyfaidx` for fetching `chr:start-end` or BED regions.
+
+Install with:
+
+```
+pip install lineindex[bio]
+```
+
+Python examples:
+
+```python
+from lineindex.region import RegionIndex
+
+idx = RegionIndex("chr1_align.tsv")
+if not idx.exists():
+    idx.build()
+lines = idx.query_lines("chr1", 100000, 101000)
+records = idx.fetch_tsv_lines(lines, memory_map="offsets")
+
+from lineindex.fasta import fetch_region
+seq = fetch_region("ref.fa", "chr1:100000-101000")
+```
 
 ## Performance
 

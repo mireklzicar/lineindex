@@ -45,12 +45,16 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 TABIX_DIR = DATA_DIR / "tabix"
 RESULTS_PATH = Path(__file__).resolve().parent / "results.json"
 LINEINDEX_VARIANTS: Sequence[tuple[str, Dict[str, object]]] = (
+    # Uncompressed variants
     ("lineindex_auto", {"memory_map": "auto", "compress": False}),
     ("lineindex_none", {"memory_map": "none", "compress": False}),
     ("lineindex_offsets", {"memory_map": "offsets", "compress": False}),
     ("lineindex_data", {"memory_map": "data", "compress": False}),
     ("lineindex_all", {"memory_map": "all", "compress": False}),
+    # Compressed (idzip/BGZF) variants
     ("lineindex_compressed", {"memory_map": "auto", "compress": True}),
+    ("lineindex_compressed_offsets", {"memory_map": "offsets", "compress": True}),
+    ("lineindex_compressed_none", {"memory_map": "none", "compress": True}),
 )
 
 LINE_COUNTS: Sequence[int] = (

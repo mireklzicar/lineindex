@@ -12,6 +12,13 @@ import argparse
 from typing import Optional, List, Union
 from .lineindex import LineIndex
 from .example import create_example_file, DEFAULT_NUM_LINES
+from .region import RegionIndex
+try:
+    from .fasta import fetch_region as fasta_fetch_region  # type: ignore
+    from .fasta import fetch_bed as fasta_fetch_bed  # type: ignore
+    _FASTA_OK = True
+except Exception:
+    _FASTA_OK = False
 
 
 def parse_range(range_str: str) -> Union[int, slice]:
@@ -124,13 +131,47 @@ def main(argv: Optional[List[str]] = None) -> int:
         help="Memory mapping mode: auto (default), none, offsets, data, or all",
     )
 
+    # Region adapter commands
+    region_parser = subparsers.add_parser(
+        "region",
+        help="Build/query a simple region index over a TSV (chrom, start, end, ...) and fetch matching lines",
+    )
+    region_sub = region_parser.add_subparsers(dest="region_cmd", help="region subcommand")
+
+    region_build = region_sub.add_parser("build", help="Build region index for a TSV")
+    region_build.add_argument("--tsv", required=True, help="Path to TSV with chrom,start,end,... columns")
+    region_build.add_argument(
+        "--index-dir", default=None, help="Directory to store the index (default: <tsv>.li_region)"
+    )
+
+    region_query = region_sub.add_parser("query", help="Query TSV via region index using a BED file and print matching TSV lines")
+    region_query.add_argument("--tsv", required=True, help="Path to TSV with chrom,start,end,... columns")
+    region_query.add_argument("--index-dir", default=None, help="Directory with the index (build if missing)")
+    region_query.add_argument("--bed", required=True, help="BED file with regions")
+    region_query.add_argument("--compress", action="store_true", help="Use LineIndex compressed mode (.dz)")
+    region_query.add_argument(
+        "--memory-map",
+        choices=["auto", "none", "offsets", "data", "all"],
+        default="offsets",
+        help="Memory mapping mode for LineIndex when fetching lines",
+    )
+
+    # FASTA helpers (optional)
+    fasta_parser = subparsers.add_parser("fasta", help="FASTA helpers (requires pyfaidx)")
+    fasta_sub = fasta_parser.add_subparsers(dest="fasta_cmd", help="fasta subcommand")
+    fasta_fetch = fasta_sub.add_parser("fetch", help="Fetch sequences by region or BED")
+    fasta_fetch.add_argument("--fasta", required=True, help="FASTA path (indexed with .fai)")
+    group = fasta_fetch.add_mutually_exclusive_group(required=True)
+    group.add_argument("--region", help="Region like chr:start-end")
+    group.add_argument("--bed", help="BED file with regions")
+
     # Backwards-compat: if argv is None, get it from sys.argv
     if argv is None:
         argv = sys.argv[1:]
 
     # Here's the key change: handle backwards compatibility BEFORE parsing
     # If the first argument looks like a file path and not a command, insert 'file'
-    if argv and argv[0] not in ("example", "file", "-h", "--help"):
+    if argv and argv[0] not in ("example", "file", "region", "fasta", "-h", "--help"):
         argv.insert(0, "file")
 
     args = parser.parse_args(argv)
@@ -145,6 +186,36 @@ def main(argv: Optional[List[str]] = None) -> int:
         # Handle file command
         if args.command == "file":
             return handle_file_command(args)
+
+        if args.command == "region":
+            if args.region_cmd == "build":
+                idx = RegionIndex(args.tsv, args.index_dir)
+                idx.build()
+                print(f"Built region index at {idx.index_dir} for {args.tsv}")
+                return 0
+            if args.region_cmd == "query":
+                idx = RegionIndex(args.tsv, args.index_dir)
+                if not idx.exists():
+                    idx.build()
+                lines = idx.query_lines_bed(args.bed)
+                fetched = idx.fetch_tsv_lines(lines, memory_map=args.memory_map, compress=args.compress)
+                for rec in fetched:
+                    print(rec)
+                return 0
+
+        if args.command == "fasta":
+            if not _FASTA_OK:
+                print("Error: pyfaidx is required. Install with `pip install lineindex[bio]`.", file=sys.stderr)
+                return 1
+            if args.fasta_cmd == "fetch":
+                if args.region:
+                    print(fasta_fetch_region(args.fasta, args.region))
+                    return 0
+                if args.bed:
+                    for chrom, s, e, seq in fasta_fetch_bed(args.fasta, args.bed):
+                        print(f"{chrom}\t{s}\t{e}\t{seq}")
+                    return 0
+            return 1
 
         # If no command specified, show help
         parser.print_help()

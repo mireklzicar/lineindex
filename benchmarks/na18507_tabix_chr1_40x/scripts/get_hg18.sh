@@ -7,9 +7,11 @@ mkdir -p "$REFDIR"
 pushd "$REFDIR" >/dev/null
 
 BASE="https://hgdownload.soe.ucsc.edu/goldenPath/hg18/chromosomes"
-# Grab all chrom fasta.gz (chr1..chr22, X, Y, M, *_random if desired)
-# For our purposes we at least need chr1, but we align genome-wide then subset.
-for chr in {1..22} X Y M; do
+# Grab per-chromosome fasta.gz. Default: chr1..22, X, Y, M.
+# Override with CHR_LIST (e.g. CHR_LIST="1" downloads chr1 only).
+DEFAULT_CHRS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y M"
+CHR_LIST=( ${CHR_LIST:-$DEFAULT_CHRS} )
+for chr in "${CHR_LIST[@]}"; do
   f="chr${chr}.fa.gz"
   url="${BASE}/${f}"
   if [[ ! -s "$f" ]]; then

@@ -1,0 +1,21 @@
+name: na18507
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # CLI tools for the NA18507 pipeline and Tabix benchmarking
+  - python=3.10
+  - bwa
+  - samtools
+  - htslib  # provides bgzip + tabix
+  - pigz
+  - bc
+  - curl
+  - wget
+  - pip
+  # Python deps for benchmarks
+  - numpy
+  - tqdm
+  - matplotlib  # optional (plots)
+  - pip:
+      - indxr
